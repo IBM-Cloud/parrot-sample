@@ -1,0 +1,12 @@
+{
+  "name": "Parrot-AR-Drone-Sample",
+  "description": "Sample on how to control a Parrot AR Drone with MQTT commands",
+  "dependencies": {
+    "ar-drone": "0.3.3",
+    "mqtt":"1.0.5",
+    "getmac":"1.0.6",
+    "properties":"1.2.1"
+  },
+  "license": "IBM"
+}
+  
