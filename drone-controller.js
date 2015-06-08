@@ -18,6 +18,17 @@ var mqtt = require('mqtt');
 var properties = require('properties');
 var arDrone = require('ar-drone'); 
 var drone = arDrone.createClient(); 
+var request = require('request');
+
+var pngStream = drone.getPngStream();
+pngStream.on('error', function() {
+  console.log('There was an error getting the PNG stream from the drone.');
+});
+
+var latestPng;
+pngStream.on('data', function(png) {
+  latestPng = png;
+});
 
 properties.parse('./drone-config.properties', {path: true}, function(err, cfg) {
     if (err) {
@@ -32,7 +43,7 @@ properties.parse('./drone-config.properties', {path: true}, function(err, cfg) {
 
 function start(deviceId, apiKey, apiToken, mqttHost, mqttPort) {
   var org = apiKey.split('-')[1];
-  var clientId = ['d', org, 'parrot-ar', 'ryansdrone'].join(':');
+  var clientId = ['d', org, 'parrot-ar', deviceId].join(':');
   var client = mqtt.connect("mqtt://" + mqttHost + ":" + mqttPort, {
               "clientId" : clientId,
               "keepalive" : 30,
@@ -68,12 +79,44 @@ function start(deviceId, apiKey, apiToken, mqttHost, mqttPort) {
 	   drone.land();
    } else if(msg.d.action === '#takeoffandland') {
      console.log('take off and land');
+     var length = msg.d.length ? msg.d.length : 3000;
      drone.disableEmergency();
 		 drone.takeoff();
      setTimeout(function() {
        drone.stop();
 	     drone.land();
-     }, 3000);
-   }
-  });
+     }, length);
+   } else if(msg.d.action === '#takepicture') {
+    console.log('take a picture');
+    pngStream = drone.getPngStream();
+    if(!latestPng) {
+      console.log('No images yet');
+      var options = {
+        uri: msg.d.callback,
+        method: 'POST',
+        json: {
+          "error" : "No image"
+        }
+      };
+      request(options, function (error, response, body) {});
+    } else {
+      var formData = {
+        my_file: {
+          value: latestPng,
+          options: {
+            filename: 'picture.png',
+            contentType: 'image/png'
+          }
+        }
+      };
+      request.post({uri: msg.d.callback, formData: formData}, function(err, httpResponse, body) {
+        if(err) {
+          console.log("error posting picture " + err);
+        } else {
+          console.log('Picture uploaded');
+        }
+      });
+    }
+  }
+ });
 };
