@@ -63,3 +63,40 @@ The `drone-app.js` fule can be replaced by a Node-RED flow if you want.  Here is
 ```
 
 You can copy the above JSON and import it into a Node-RED instance on Bluemix.  (Make sure you have the IoT service you created bound to your Node-RED instance.)  Once you have imported the flow you will need to double click on the IBM IoT node to open the configuration properties and replace the device ID with the device ID you registered your drone with in Bluemix.
+
+# Supported Commands
+
+The `drone-app.js` file just makes the drone take off and then land immediately as a demonstration
+of what you can do to control the drone.  In other words it is just a start.  `drone-controller.js`
+supports other commands besides just take off and land.  Here is what is supported out of the box.
+
+* Take off and land
+* Take off
+* Land
+* Take A Picture
+
+To issue these commands to the drone you publish a command over MQTT on the topic
+`iot-2/type/parrot-ar/id/<deviceid>/cmd/fly/fmt/json` replacing <deviceid> with the 
+device ID of the drone you want to control.  You need to publish a JSON payload
+which should look like 
+
+```
+{
+  d: {
+    action : "#takeoffandland"
+  }
+}
+```
+
+Replace the `action` property with whatever command you want the drone to execute.  The supported
+actions are `#takeoff`, `#land`, `takeoffandland`, and `#takepicture`.  For more information on
+using MQTT and publishing commands you can check out the documentation on the IoT Foundation 
+[website](https://developer.ibm.com/iotfoundation/recipes/improvise-application-development/).
+
+# Extending
+
+`done-controller.js` is just a sampling of what you can do to control the drone programmatically.
+Essentially `drone-controller.js` just providing an MQTT wrapper around the Node.js library used
+to talk to the drone.  You can extend `drone-controller.js` with other commands that use the
+Node.js library to control the drone.  Just modify the source and use the API documented in the
+[GitHub repo](https://github.com/felixge/node-ar-drone).
