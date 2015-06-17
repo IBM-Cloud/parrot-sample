@@ -40,6 +40,27 @@ properties.parse('./drone-config.properties', {path: true}, function(err, cfg) {
   });
 
 function start(deviceId, apiKey, apiToken, mqttHost, mqttPort) {
+  // We only want to sample drone data one a second,
+  // default data rate is way too fast.
+  var handle_navdata = function (navdata) {
+    // Sometimes battery data is missing, look for next event.
+    if (!navdata.demo) return drone.once('navdata', handle_navdata);
+
+    console.log("GPS: " + JSON.stringify(navdata.gps))
+    console.log("Battery percentage: " + navdata.demo.batteryPercentage + "%");
+    client.publish('iot-2/type/parrot-ar/id/' + deviceId + '/data/battery', 
+      navdata.demo.batteryPercentage, function () {
+        console.log("Battery percentage published.")
+    }); 
+
+    setTimeout(function () {
+      drone.once('navdata', handle_navdata);
+    }, 60 * 1000)
+  }
+
+  drone.once('navdata', handle_navdata);
+  drone.config('general:navdata_demo', 'FALSE');
+
   var org = apiKey.split('-')[1];
   var clientId = ['d', org, 'parrot-ar', deviceId].join(':');
   var client = mqtt.connect("mqtt://" + mqttHost + ":" + mqttPort, {
