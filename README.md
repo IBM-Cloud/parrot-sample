@@ -50,13 +50,13 @@ Open a terminal window, `cd` to the root of the repository, and run `npm install
 
 Now start up the controller code by running `node drone-controller.js`.  This is the JavaScript code that controlls the drone.
 
-Next start up the app code by running `node drone-app.js`.  This is the JavaScript code which issues MQTT commands to the drone.  By default this will issue a command for the drone to take off and then immediatelly land.
+Next start up the app code by running `node drone-app.js`.  This is the JavaScript code which issues MQTT commands to the drone.  By default this will issue a command for the drone to take off and then immediately land.
 
 Technically the `drone-controller.js` and be run on a different machine than `drone-app.js`.
 
 ## Node-RED
 
-The `drone-app.js` fule can be replaced by a Node-RED flow if you want.  Here is a sample flow that issues the same commands as `drone-app.js` does.
+The `drone-app.js` file can be replaced by a Node-RED flow if you want.  Here is a sample flow that issues the same commands as `drone-app.js` does.
 
 ```
 [{"id":"989a15c.9f4b568","type":"ibmiot out","authentication":"boundService","apiKey":"","outputType":"cmd","deviceId":"yourdeviceid","deviceType":"parrot-ar","eventCommandType":"fly","format":"json","data":"___","name":"IBM IoT App Out","service":"registered","x":594,"y":285,"z":"9205662f.9e3728","wires":[]},{"id":"dbf179a1.a9a028","type":"inject","name":"take off and land","topic":"","payload":"","payloadType":"none","repeat":"","crontab":"","once":false,"x":225,"y":357,"z":"9205662f.9e3728","wires":[["2e802bb3.dd1e9c"]]},{"id":"2e802bb3.dd1e9c","type":"function","name":"","func":"msg.payload = JSON.stringify({\n    d: {\n        action : \"#takeoffandland\"\n      }\n});\nreturn msg;","outputs":1,"valid":true,"x":410,"y":358,"z":"9205662f.9e3728","wires":[["989a15c.9f4b568"]]},{"id":"bd32f7cd.b170c","type":"inject","name":"take off","topic":"","payload":"","payloadType":"none","repeat":"","crontab":"","once":false,"x":224,"y":210,"z":"9205662f.9e3728","wires":[["d8008372.a9e1d8"]]},{"id":"d8008372.a9e1d8","type":"function","name":"","func":"msg.payload = JSON.stringify({\n    d: {\n        action : \"#takeoff\"\n      }\n});\nreturn msg;","outputs":1,"valid":true,"x":383,"y":211,"z":"9205662f.9e3728","wires":[["989a15c.9f4b568"]]},{"id":"a1703893.5af8c","type":"inject","name":"land","topic":"","payload":"","payloadType":"none","repeat":"","crontab":"","once":false,"x":212,"y":282,"z":"9205662f.9e3728","wires":[["b22fc6df.076ec"]]},{"id":"b22fc6df.076ec","type":"function","name":"","func":"msg.payload = JSON.stringify({\n    d: {\n        action : \"#land\"\n      }\n});\nreturn msg;","outputs":1,"valid":true,"x":374,"y":286,"z":"9205662f.9e3728","wires":[["989a15c.9f4b568"]]}]
@@ -92,6 +92,13 @@ Replace the `action` property with whatever command you want the drone to execut
 actions are `#takeoff`, `#land`, `takeoffandland`, and `#takepicture`.  For more information on
 using MQTT and publishing commands you can check out the documentation on the IoT Foundation 
 [website](https://developer.ibm.com/iotfoundation/recipes/improvise-application-development/).
+
+## Supporting Using The Camera
+
+In order to use the camera on the drone you need to have FFMPEG installed and running on your
+machine.  You can download FFMPEG from their [site](https://www.ffmpeg.org/).  If you don't
+install FFMPEG you will get an error saying that the library is required when running 
+`drone-controller.js`.
 
 # Extending
 

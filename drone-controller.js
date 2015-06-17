@@ -21,9 +21,7 @@ var drone = arDrone.createClient();
 var request = require('request');
 
 var pngStream = drone.getPngStream();
-pngStream.on('error', function() {
-  console.log('There was an error getting the PNG stream from the drone.');
-});
+pngStream.on('error', console.log);
 
 var latestPng;
 pngStream.on('data', function(png) {
