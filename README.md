@@ -1,12 +1,12 @@
-# Parrot AR Drone Sample
+# Parrot Drone Sample
 
 This repository contains sample code that demonstrates how you would control
-a Parrot AR Drone using MQTT, the IBM IoT Foundation, and the [node-ar-drone](https://github.com/felixge/node-ar-drone) module.
+a Parrot Drone using MQTT, the IBM IoT Foundation, and the [node-ar-drone](https://github.com/felixge/node-ar-drone) module or the [node-bebop](https://github.com/hybridgroup/node-bebop) module.
 
 # Running The Sample
 
 ## Hardware
-You will obviously need a Parrot AR Drone and 2 network adapters on your computer, one network adapter with a connection to the WiFi network for the drone and another network adapter with a connection to the internet.  At least one network adapter needs to be a WiFi adapter since the Parrot AR Drone emits a WiFi hotspot.
+You will need a Parrot AR Drone or a Parrot Bebop Drone and 2 network adapters on your computer, one network adapter with a connection to the WiFi network for the drone and another network adapter with a connection to the internet.  At least one network adapter needs to be a WiFi adapter since the Parrot drones emits a WiFi hotspot.
 
 ## Getting The Code
 
@@ -17,7 +17,7 @@ You will obviously need a Parrot AR Drone and 2 network adapters on your compute
 You will need to create an instance of the [IBM IoT Foundation](https://console.ng.bluemix.net/?ace_base=true/#/store/cloudOEPaneId=store&serviceOfferingGuid=8e3a9040-7ce8-4022-a36b-47f836d2b83e&fromCatalog=true) service in Bluemix.  Within the IoT Foundation dashboard your need to register a device as well as an app.
 
 1. Click the Devices tab and click Add Device.  
-2. Create a new Device Type called "parrot-ar".  
+2. Create a new Device Type called "drone".  
 3. In the Device ID field enter a unique ID for your drone.  
 4. Click Continue
 
@@ -48,18 +48,20 @@ Now you are ready to run the code.
 
 Open a terminal window, `cd` to the root of the repository, and run `npm install` to install all the dependencies.
 
-Now start up the controller code by running `node drone-controller.js`.  This is the JavaScript code that controlls the drone.
+Now start up the controller code by running `node parrot-ar-drone-controller.js`
+if you have a Parrot AR Drone or `node bebop-drone-controller.js` 
+if you have a Parrot Bebop.  This is the JavaScript code that controls the drone.
 
 Next start up the app code by running `node drone-app.js`.  This is the JavaScript code which issues MQTT commands to the drone.  By default this will issue a command for the drone to take off and then immediately land.
 
-Technically the `drone-controller.js` and be run on a different machine than `drone-app.js`.
+Technically the `parrot-ar-drone-controller.js` and `bebop-drone-controller.js` can be run on a different machine than `drone-app.js`.
 
 ## Node-RED
 
 The `drone-app.js` file can be replaced by a Node-RED flow if you want.  Here is a sample flow that issues the same commands as `drone-app.js` does.
 
 ```
-[{"id":"989a15c.9f4b568","type":"ibmiot out","authentication":"boundService","apiKey":"","outputType":"cmd","deviceId":"yourdeviceid","deviceType":"parrot-ar","eventCommandType":"fly","format":"json","data":"___","name":"IBM IoT App Out","service":"registered","x":594,"y":285,"z":"9205662f.9e3728","wires":[]},{"id":"dbf179a1.a9a028","type":"inject","name":"take off and land","topic":"","payload":"","payloadType":"none","repeat":"","crontab":"","once":false,"x":225,"y":357,"z":"9205662f.9e3728","wires":[["2e802bb3.dd1e9c"]]},{"id":"2e802bb3.dd1e9c","type":"function","name":"","func":"msg.payload = JSON.stringify({\n    d: {\n        action : \"#takeoffandland\"\n      }\n});\nreturn msg;","outputs":1,"valid":true,"x":410,"y":358,"z":"9205662f.9e3728","wires":[["989a15c.9f4b568"]]},{"id":"bd32f7cd.b170c","type":"inject","name":"take off","topic":"","payload":"","payloadType":"none","repeat":"","crontab":"","once":false,"x":224,"y":210,"z":"9205662f.9e3728","wires":[["d8008372.a9e1d8"]]},{"id":"d8008372.a9e1d8","type":"function","name":"","func":"msg.payload = JSON.stringify({\n    d: {\n        action : \"#takeoff\"\n      }\n});\nreturn msg;","outputs":1,"valid":true,"x":383,"y":211,"z":"9205662f.9e3728","wires":[["989a15c.9f4b568"]]},{"id":"a1703893.5af8c","type":"inject","name":"land","topic":"","payload":"","payloadType":"none","repeat":"","crontab":"","once":false,"x":212,"y":282,"z":"9205662f.9e3728","wires":[["b22fc6df.076ec"]]},{"id":"b22fc6df.076ec","type":"function","name":"","func":"msg.payload = JSON.stringify({\n    d: {\n        action : \"#land\"\n      }\n});\nreturn msg;","outputs":1,"valid":true,"x":374,"y":286,"z":"9205662f.9e3728","wires":[["989a15c.9f4b568"]]}]
+[{"id":"989a15c.9f4b568","type":"ibmiot out","authentication":"boundService","apiKey":"","outputType":"cmd","deviceId":"yourdeviceid","deviceType":"drone","eventCommandType":"fly","format":"json","data":"___","name":"IBM IoT App Out","service":"registered","x":594,"y":285,"z":"9205662f.9e3728","wires":[]},{"id":"dbf179a1.a9a028","type":"inject","name":"take off and land","topic":"","payload":"","payloadType":"none","repeat":"","crontab":"","once":false,"x":225,"y":357,"z":"9205662f.9e3728","wires":[["2e802bb3.dd1e9c"]]},{"id":"2e802bb3.dd1e9c","type":"function","name":"","func":"msg.payload = JSON.stringify({\n    d: {\n        action : \"#takeoffandland\"\n      }\n});\nreturn msg;","outputs":1,"valid":true,"x":410,"y":358,"z":"9205662f.9e3728","wires":[["989a15c.9f4b568"]]},{"id":"bd32f7cd.b170c","type":"inject","name":"take off","topic":"","payload":"","payloadType":"none","repeat":"","crontab":"","once":false,"x":224,"y":210,"z":"9205662f.9e3728","wires":[["d8008372.a9e1d8"]]},{"id":"d8008372.a9e1d8","type":"function","name":"","func":"msg.payload = JSON.stringify({\n    d: {\n        action : \"#takeoff\"\n      }\n});\nreturn msg;","outputs":1,"valid":true,"x":383,"y":211,"z":"9205662f.9e3728","wires":[["989a15c.9f4b568"]]},{"id":"a1703893.5af8c","type":"inject","name":"land","topic":"","payload":"","payloadType":"none","repeat":"","crontab":"","once":false,"x":212,"y":282,"z":"9205662f.9e3728","wires":[["b22fc6df.076ec"]]},{"id":"b22fc6df.076ec","type":"function","name":"","func":"msg.payload = JSON.stringify({\n    d: {\n        action : \"#land\"\n      }\n});\nreturn msg;","outputs":1,"valid":true,"x":374,"y":286,"z":"9205662f.9e3728","wires":[["989a15c.9f4b568"]]}]
 ```
 
 You can copy the above JSON and import it into a Node-RED instance on Bluemix.  (Make sure you have the IoT service you created bound to your Node-RED instance.)  Once you have imported the flow you will need to double click on the IBM IoT node to open the configuration properties and replace the device ID with the device ID you registered your drone with in Bluemix.
@@ -73,10 +75,10 @@ supports other commands besides just take off and land.  Here is what is support
 * Take off and land
 * Take off
 * Land
-* Take A Picture
+* Take A Picture - The picture command is not yet supported with the Bebop drone
 
 To issue these commands to the drone you publish a command over MQTT on the topic
-`iot-2/type/parrot-ar/id/<deviceid>/cmd/fly/fmt/json` replacing <deviceid> with the 
+`iot-2/type/drone/id/<deviceid>/cmd/fly/fmt/json` replacing <deviceid> with the 
 device ID of the drone you want to control.  You need to publish a JSON payload
 which should look like 
 
@@ -102,8 +104,8 @@ install FFMPEG you will get an error saying that the library is required when ru
 
 # Extending
 
-`done-controller.js` is just a sampling of what you can do to control the drone programmatically.
-Essentially `drone-controller.js` just providing an MQTT wrapper around the Node.js library used
-to talk to the drone.  You can extend `drone-controller.js` with other commands that use the
+`parrot-ar-drone-controller.js` and `bebop-drone-controller.js` are just a sampling of what you can do to control the drone programmatically.
+Essentially `*-drone-controller.js` just providing an MQTT wrapper around the Node.js library used
+to talk to the drone.  You can extend `*-drone-controller.js` with other commands that use the
 Node.js library to control the drone.  Just modify the source and use the API documented in the
-[GitHub repo](https://github.com/felixge/node-ar-drone).
+GitHub repos for the [Parrot AR Drone](https://github.com/felixge/node-ar-drone) or for the [Bebop Drone](https://github.com/hybridgroup/node-bebop).

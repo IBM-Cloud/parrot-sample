@@ -44,7 +44,7 @@ function start(deviceId, apiKey, apiToken, mqttHost, mqttPort) {
         action : "#takeoffandland"
       }
     };
-    client.publish('iot-2/type/parrot-ar/id/' + deviceId + '/cmd/fly/fmt/json', JSON.stringify(data), 
+    client.publish('iot-2/type/drone/id/' + deviceId + '/cmd/fly/fmt/json', JSON.stringify(data), 
     function() {
       console.log('published');
       process.exit(0);

@@ -14,8 +14,7 @@
 // limitations under the License.
 //------------------------------------------------------------------------------
 
-var mqtt = require('mqtt');
-var properties = require('properties');
+var mqtt = require('./mqtt-wrapper.js')();
 var arDrone = require('ar-drone'); 
 var drone = arDrone.createClient(); 
 var request = require('request');
@@ -28,32 +27,36 @@ pngStream.on('data', function(png) {
   latestPng = png;
 });
 
-properties.parse('./drone-config.properties', {path: true}, function(err, cfg) {
-    if (err) {
-      console.error('A file named done-config.properties containing the device registration from the IBM IoT Cloud is missing.');
-      console.error('The file must contain the following properties: apikey, apitoken, authtoken, and deviceid.');
-      throw e;
-    }
-    var org = cfg.apikey.split('-')[1];
-    start(cfg.deviceid, cfg.apikey, cfg.authtoken, org + '.messaging.internetofthings.ibmcloud.com', 
-        '1883');
-  });
 
-function start(deviceId, apiKey, apiToken, mqttHost, mqttPort) {
-  var org = apiKey.split('-')[1];
-  var clientId = ['d', org, 'parrot-ar', deviceId].join(':');
-  var client = mqtt.connect("mqtt://" + mqttHost + ":" + mqttPort, {
-              "clientId" : clientId,
-              "keepalive" : 30,
-              "username" : "use-token-auth",
-              "password" : apiToken
-            });
+mqtt.connect(function(client, deviceId) {
   client.on('connect', function() {
     console.log('MQTT client connected to IBM IoT Cloud.');
     client.subscribe('iot-2/cmd/fly/fmt/json', {qos : 0}, function(err, granted) {
       if (err) throw err;
       console.log("subscribed");
     });
+
+    // We only want to sample drone data one a second,
+    // default data rate is way too fast.
+    var handle_navdata = function (navdata) {
+      // Sometimes battery data is missing, look for next event.
+      if (!navdata.demo) return drone.once('navdata', handle_navdata);
+
+      console.log("GPS: " + JSON.stringify(navdata.gps))
+      console.log("Battery percentage: " + navdata.demo.batteryPercentage + "%");
+      client.publish('iot-2/type/drone/id/' + deviceId + '/data/battery', 
+        navdata.demo.batteryPercentage, function () {
+          console.log("Battery percentage published.")
+      }); 
+
+      setTimeout(function () {
+        drone.once('navdata', handle_navdata);
+      }, 60 * 1000)
+    };
+
+    drone.once('navdata', handle_navdata);
+    drone.config('general:navdata_demo', 'FALSE');
+
   });
   client.on('error', function(err) {
     console.error('client error ' + err);
@@ -70,19 +73,19 @@ function start(deviceId, apiKey, apiToken, mqttHost, mqttPort) {
    if(msg.d.action === '#takeoff') {
      console.log('take off');
      drone.disableEmergency();
-		 drone.takeoff();
+     drone.takeoff();
    } else if(msg.d.action === '#land') {
      console.log('land');
      drone.stop();
-	   drone.land();
+     drone.land();
    } else if(msg.d.action === '#takeoffandland') {
      console.log('take off and land');
      var length = msg.d.length ? msg.d.length : 3000;
      drone.disableEmergency();
-		 drone.takeoff();
+     drone.takeoff();
      setTimeout(function() {
        drone.stop();
-	     drone.land();
+       drone.land();
      }, length);
    } else if(msg.d.action === '#takepicture') {
     console.log('take a picture');
@@ -117,4 +120,4 @@ function start(deviceId, apiKey, apiToken, mqttHost, mqttPort) {
     }
   }
  });
-};
+});
