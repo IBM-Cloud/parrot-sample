@@ -27,7 +27,6 @@ pngStream.on('data', function(png) {
   latestPng = png;
 });
 
-
 mqtt.connect(function(client, deviceId) {
   client.on('connect', function() {
     console.log('MQTT client connected to IBM IoT Cloud.');
