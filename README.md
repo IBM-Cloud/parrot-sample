@@ -10,7 +10,7 @@ You will need a Parrot AR Drone or a Parrot Bebop Drone and 2 network adapters o
 
 ## Getting The Code
 
-`$ git clone https://github.com/IBM-Bluemix/parrot-ar-sample.git`
+`$ git clone https://github.com/IBM-Bluemix/parrot-sample.git`
 
 ## Setting Up The Sample
 
