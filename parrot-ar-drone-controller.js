@@ -72,11 +72,40 @@ mqtt.connect(function(client, deviceId) {
    if(msg.d.action === '#takeoff') {
      console.log('take off');
      drone.disableEmergency();
+     drone.config('control:altitude_max', 2000);
      drone.takeoff();
    } else if(msg.d.action === '#land') {
      console.log('land');
      drone.stop();
      drone.land();
+   } else if(msg.d.action === '#up') {
+     console.log('up');
+     drone.stop();
+     drone.up(0.2);
+     setTimeout(function() {
+       drone.stop();
+     }, 2000);
+   } else if(msg.d.action === '#down') {
+     console.log('down');
+     drone.stop();
+     drone.down(0.2);
+     setTimeout(function() {
+       drone.stop();
+     }, 1000);
+   } else if(msg.d.action === '#rotatec') {
+     console.log('rotatec');
+     drone.stop();
+     drone.clockwise(0.2);
+     setTimeout(function() {
+       drone.stop();
+     }, 1000);
+   } else if(msg.d.action === '#rotatecc') {
+     console.log('rotatecc');
+     drone.stop();
+     drone.counterClockwise(0.2);
+     setTimeout(function() {
+       drone.stop();
+     }, 1000);
    } else if(msg.d.action === '#takeoffandland') {
      console.log('take off and land');
      var length = msg.d.length ? msg.d.length : 3000;
