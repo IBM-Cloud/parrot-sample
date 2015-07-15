@@ -139,6 +139,7 @@ mqtt.connect(function(client, deviceId) {
         }
       };
       request.post({uri: msg.d.callback, formData: formData}, function(err, httpResponse, body) {
+        latestPng = undefined;
         if(err) {
           console.log("error posting picture " + err);
         } else {
