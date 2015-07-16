@@ -34,9 +34,12 @@ drone.connect(function() {
   	client.on('connect', function() {
 	  console.log('MQTT client connected to IBM IoT Cloud.');
 	  drone.on('battery', function(battery) {
-	  	console.log("Battery percentage: " +battery + "%");
-	  	client.publish('iot-2/type/drone/id/' + deviceId + '/data/battery', 
-	      battery, function () {
+	  	console.log("Battery percentage: " + battery + "%");
+	  	client.publish('iot-2/evt/battery/fmt/json', JSON.stringify({
+          "d" : {
+            "batteryPercentage" : battery
+          }
+        }), function () {
 	        console.log("Battery percentage published.")
 	    });
 	  });

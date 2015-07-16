@@ -43,8 +43,11 @@ mqtt.connect(function(client, deviceId) {
 
       console.log("GPS: " + JSON.stringify(navdata.gps))
       console.log("Battery percentage: " + navdata.demo.batteryPercentage + "%");
-      client.publish('iot-2/type/drone/id/' + deviceId + '/data/battery', 
-        navdata.demo.batteryPercentage, function () {
+      client.publish('iot-2/evt/battery/fmt/json', JSON.stringify({
+        "d" : {
+          "batteryPercentage" : navdata.demo.batteryPercentage
+        }
+      }), function () {
           console.log("Battery percentage published.")
       }); 
 
