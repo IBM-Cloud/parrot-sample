@@ -40,8 +40,6 @@ mqtt.connect(function(client, deviceId) {
     var handle_navdata = function (navdata) {
       // Sometimes battery data is missing, look for next event.
       if (!navdata.demo) return drone.once('navdata', handle_navdata);
-
-      console.log("GPS: " + JSON.stringify(navdata.gps))
       console.log("Battery percentage: " + navdata.demo.batteryPercentage + "%");
       client.publish('iot-2/evt/battery/fmt/json', JSON.stringify({
         "d" : {
@@ -50,6 +48,17 @@ mqtt.connect(function(client, deviceId) {
       }), function () {
           console.log("Battery percentage published.")
       }); 
+
+      if(navdata.gps) { 
+        client.publish('iot-2/evt/gps/fmt/json', JSON.stringify({
+          "d" : {
+            "longitude" : navdata.gps.longitude,
+            "latitude" : navdata.gps.latitude
+          }
+        }), function() {
+          console.log("GPS data published.")
+        });
+      }
 
       setTimeout(function () {
         drone.once('navdata', handle_navdata);
