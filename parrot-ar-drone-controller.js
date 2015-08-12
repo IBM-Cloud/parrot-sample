@@ -39,6 +39,7 @@ mqtt.connect(function(client, deviceId) {
     // default data rate is way too fast.
     var handle_navdata = function (navdata) {
       // Sometimes battery data is missing, look for next event.
+      // console.log(navdata);
       if (!navdata.demo) return drone.once('navdata', handle_navdata);
       console.log("Battery percentage: " + navdata.demo.batteryPercentage + "%");
       client.publish('iot-2/evt/battery/fmt/json', JSON.stringify({
@@ -151,7 +152,7 @@ mqtt.connect(function(client, deviceId) {
         }
       };
       request.post({uri: msg.d.callback, formData: formData}, function(err, httpResponse, body) {
-        latestPng = undefined;
+        latestPng = drone.getPngStream();
         if(err) {
           console.log("error posting picture " + err);
         } else {
