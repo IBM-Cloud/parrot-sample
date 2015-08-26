@@ -130,7 +130,6 @@ mqtt.connect(function(client, deviceId) {
      }, length);
    } else if(msg.d.action === '#takepicture') {
     console.log('take a picture');
-    pngStream = drone.getPngStream();
     if(!latestPng) {
       console.log('No images yet');
       var options = {
@@ -152,7 +151,6 @@ mqtt.connect(function(client, deviceId) {
         }
       };
       request.post({uri: msg.d.callback, formData: formData}, function(err, httpResponse, body) {
-        latestPng = drone.getPngStream();
         if(err) {
           console.log("error posting picture " + err);
         } else {
