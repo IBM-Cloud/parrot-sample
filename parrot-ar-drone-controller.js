@@ -108,20 +108,20 @@ mqtt.connect(function(client, deviceId) {
    } else if(msg.d.action === '#rotatec') {
      console.log('rotatec');
      drone.stop();
-     drone.clockwise(0.2);
+     drone.clockwise(0.3);
      setTimeout(function() {
        drone.stop();
      }, 1000);
    } else if(msg.d.action === '#rotatecc') {
      console.log('rotatecc');
      drone.stop();
-     drone.counterClockwise(0.2);
+     drone.counterClockwise(0.3);
      setTimeout(function() {
        drone.stop();
      }, 1000);
    } else if(msg.d.action === '#takeoffandland') {
      console.log('take off and land');
-     var length = msg.d.length ? msg.d.length : 3000;
+     var length = msg.d.length ? msg.d.length : 4000;
      drone.disableEmergency();
      drone.takeoff();
      setTimeout(function() {

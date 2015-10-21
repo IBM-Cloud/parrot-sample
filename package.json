@@ -9,7 +9,9 @@
     "getmac": "1.0.6",
     "mqtt": "1.0.5",
     "properties": "1.2.1",
-    "request": "^2.57.0"
+    "request": "^2.57.0",
+    "pause-stream": "*",
+    "delayed-stream":"*"
   },
   "license": "IBM"
 }
