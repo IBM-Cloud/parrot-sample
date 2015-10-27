@@ -25,7 +25,6 @@ var consumer = new MjpegConsumer();
 var latestMjpeg;
 class EchoStream extends stream.Writable {
    _write(chunk, enc, next) {
-     console.log(chunk.length);
      latestMjpeg = chunk;
      next();
    }
