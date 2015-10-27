@@ -69,17 +69,55 @@ drone.connect(function() {
 	   var msg = JSON.parse(message.toString());
 	   if(msg.d.action === '#takeoff') {
 	     console.log('take off');
-		 drone.takeoff();
+		 drone.takeOff();
 	   } else if(msg.d.action === '#land') {
 	     console.log('land');
 		 drone.land();
-	   } else if(msg.d.action === '#takeoffandland') {
-	     console.log('take off and land');
-	     var length = msg.d.length ? msg.d.length : 3000;
-		 drone.takeOff();
-	     setTimeout(function() {
-		   drone.land();
-	     }, length);
+           } else if(msg.d.action === '#up') {
+             console.log('up');
+             drone.stop();
+             drone.up(0.2);
+             setTimeout(function() {
+             drone.stop();
+             }, 2000);
+           } else if(msg.d.action === '#down') {
+             console.log('down');
+             drone.stop();
+             drone.down(0.2);
+             setTimeout(function() {
+             drone.stop();
+             }, 1000);
+           } else if(msg.d.action === '#rotatec') {
+             console.log('rotatec');
+             drone.stop();
+             drone.clockwise(0.3);
+             setTimeout(function() {
+             drone.stop();
+             }, 1000);
+           } else if(msg.d.action === '#rotatecc') {
+             console.log('rotatecc');
+             drone.stop();
+             drone.counterClockwise(0.3);
+             setTimeout(function() {
+             drone.stop();
+             }, 1000);
+           } else if(msg.d.action === '#takeoffandland') {
+             console.log('take off and land');
+             var length = msg.d.length ? msg.d.length : 5000;
+             //drone.disableEmergency();
+             drone.takeOff();
+             setTimeout(function() {
+                drone.stop();
+                drone.land();
+              }, length);
+
+	   //} else if(msg.d.action === '#takeoffandland') {
+	     //console.log('take off and land');
+	     //var length = msg.d.length ? msg.d.length : 4000;
+	//	 drone.takeOff();
+	  //   setTimeout(function() {
+	//	   drone.land();
+	  //   }, length);
 	   } else if(msg.d.action === '#takepicture') {
 	    if(!latestMjpeg) {
 	      console.log('No images yet');
