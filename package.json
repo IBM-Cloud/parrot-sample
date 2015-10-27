@@ -2,14 +2,15 @@
   "name": "Parrot-AR-Drone-Sample",
   "description": "Sample on how to control a Parrot AR Drone with MQTT commands",
   "dependencies": {
-    "node-bebop": "0.2.0",
     "ar-drone": "0.3.3",
     "cfenv": "1.0.0",
     "express": "^4.12.4",
     "getmac": "1.0.6",
     "mqtt": "1.0.5",
+    "node-bebop": "0.3.0",
     "properties": "1.2.1",
-    "request": "^2.57.0"
+    "request": "^2.57.0",
+    "mjpeg-consumer": "^0.6.2"
   },
   "license": "IBM"
 }

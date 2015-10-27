@@ -13,22 +13,29 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 //------------------------------------------------------------------------------
-
+'use strict';
 var mqtt = require('./mqtt-wrapper.js')();
 var bebop = require('node-bebop'); 
 var drone = bebop.createClient(); 
 var request = require('request');
+var stream = require('stream');
+var MjpegConsumer = require("mjpeg-consumer");
+var consumer = new MjpegConsumer();
+
+var latestMjpeg;
+class EchoStream extends stream.Writable {
+   _write(chunk, enc, next) {
+     console.log(chunk.length);
+     latestMjpeg = chunk;
+     next();
+   }
+};
 
 console.log('Trying to connect to the Bebop...');
 drone.connect(function() {
   console.log('Connected to the Bebop!');
 	
-  //TODO: Uncomment once the latest version of the library is published to npm
-  //var mjpg = drone.getMjpegStream();
-  // var latestMjpeg;
-  // mjpg.on("data", function(data) {
-  //      latestMjpeg = data;
-  //    });
+  drone.getMjpegStream().pipe(consumer).pipe(new EchoStream());
 
   mqtt.connect(function(client, deviceId) {
   	client.on('connect', function() {
@@ -74,36 +81,37 @@ drone.connect(function() {
 		   drone.land();
 	     }, length);
 	   } else if(msg.d.action === '#takepicture') {
-	    console.log('Taking a picture is not supported by the Bebop drone.');
-	    //pngStream = drone.getPngStream();
-	    // if(!latestMjpeg) {
-	    //   console.log('No images yet');
-	    //   var options = {
-	    //     uri: msg.d.callback,
-	    //     method: 'POST',
-	    //     json: {
-	    //       "error" : "No image"
-	    //     }
-	    //   };
-	    //   request(options, function (error, response, body) {});
-	    // } else {
-	    //   var formData = {
-	    //     my_file: {
-	    //       value: latestMjpeg,
-	    //       options: {
-	    //         filename: 'picture.jpeg',
-	    //         contentType: 'image/jpeg'
-	    //       }
-	    //     }
-	    //   };
-	    //   request.post({uri: msg.d.callback, formData: formData}, function(err, httpResponse, body) {
-	    //     if(err) {
-	    //       console.log("error posting picture " + err);
-	    //     } else {
-	    //       console.log('Picture uploaded');
-	    //     }
-	    //   });
-	    // }
+	    if(!latestMjpeg) {
+	      console.log('No images yet');
+	      var options = {
+	        uri: msg.d.callback,
+	        method: 'POST',
+	        json: {
+	          "error" : "No image"
+	        }
+	      };
+	      request(options, function (error, response, body) {});
+	    } else {
+	      var fs = require('fs');
+	      console.log(latestMjpeg.length);
+	      fs.writeFile('pic.jpeg', latestMjpeg, function(){console.log('written')});
+	      var formData = {
+	        my_file: {
+	          value: latestMjpeg,
+	          options: {
+	            filename: 'picture.jpeg',
+	            contentType: 'image/jpeg'
+	          }
+	        }
+	      };
+	      request.post({uri: msg.d.callback, formData: formData}, function(err, httpResponse, body) {
+	        if(err) {
+	          console.log("error posting picture " + err);
+	        } else {
+	          console.log('Picture uploaded');
+	        }
+	      });
+	    }
 	  }
     });
   });
